@@ -14,9 +14,7 @@ export const getMasterChefV1Address = () => {
   return getAddress(addresses.masterChefV1)
 }
 export const getMulticallAddress = (chainId?: number) => {
-  console.log('@addresses.multiCall', addresses.multiCall)
   const address = getAddress(addresses.multiCall, chainId)
-  console.log('@address', address)
 
   return address
 }

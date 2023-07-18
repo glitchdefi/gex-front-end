@@ -51,8 +51,8 @@ export default createReducer(initialState, (builder) =>
       },
     )
     .addCase(clearAllTransactions, (transactions, { payload: { chainId } }) => {
-      if (!transactions[chainId]) return
-      transactions[chainId] = {}
+      // if (!transactions[chainId]) return
+      // transactions[chainId] = {}
     })
     .addCase(checkedTransaction, (transactions, { payload: { chainId, hash, blockNumber } }) => {
       const tx = transactions[chainId]?.[hash]
@@ -81,7 +81,7 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(resetUserState, (transactions, { payload: { chainId } }) => {
       if (transactions[chainId]) {
-        transactions[chainId] = {}
+        // transactions[chainId] = {}
       }
     }),
 )

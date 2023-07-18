@@ -84,8 +84,8 @@ export const bsc: Chain = {
   name: 'BNB Smart Chain',
   network: 'bsc',
   rpcUrls: {
-    default: 'http://fullnodes-testnet-1.glitch.finance:9933',
-    public: 'http://fullnodes-testnet-1.glitch.finance:9933',
+    default: 'https://rpc-fullnodes-testnet.glitch.finance',
+    public: 'https://rpc-fullnodes-testnet.glitch.finance',
   },
   blockExplorers: {
     default: bscExplorer,
@@ -132,8 +132,8 @@ export const glitch: Chain = {
     symbol: 'GLCH',
   },
   rpcUrls: {
-    default: process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://api.avax-test.network/ext/bc/C/rpc',
-    public: process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://api.avax-test.network/ext/bc/C/rpc',
+    default: process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://rpc-fullnodes-testnet.glitch.finance',
+    public: process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://rpc-fullnodes-testnet.glitch.finance',
   },
   blockExplorers: {
     default: { name: 'Glitch Explorer', url: process.env.NEXT_PUBLIC_GLITCH_EXPLORER || 'https://testnet.snowtrace.io' },

@@ -1,8 +1,8 @@
 import capitalize from "lodash/capitalize";
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { CurrencyAmount, Token, Trade } from '@pancakeswap/sdk'
-import { computeTradePriceBreakdown, warningSeverity } from 'utils/exchange'
+import { CurrencyAmount, Token, Trade, TradeType } from '@pancakeswap/sdk'
+import { computeTradePriceBreakdown, warningSeverity, computeSlippageAdjustedAmounts } from 'utils/exchange'
 import {
   Button,
   Text,
@@ -23,15 +23,19 @@ import { EXCHANGE_DOCS_URLS } from 'config/constants'
 import { BIG_INT_ZERO } from 'config/constants/exchange'
 import { maxAmountSpend } from 'utils/maxAmountSpend'
 import shouldShowSwapWarning from 'utils/shouldShowSwapWarning'
+import isValidAmount from 'utils/isValidAmount'
 import { useSwapActionHandlers } from 'state/swap/useSwapActionHandlers'
 import { useGasPriceMeta } from 'state/user/hooks'
+import useToast from 'hooks/useToast'
+import QuestionHelper from 'components/QuestionHelper'
+import { TOTAL_FEE } from 'config/constants/info'
 
 import useRefreshBlockNumberID from './hooks/useRefreshBlockNumber'
 import { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Layout/Column'
 import ConfirmSwapDetails from './components/ConfirmSwapDetails'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
-import { AutoRow, RowBetween } from '../../components/Layout/Row'
+import { AutoRow, RowBetween, RowFixed } from '../../components/Layout/Row'
 import confirmPriceImpactWithoutFee from './components/confirmPriceImpactWithoutFee'
 import { Wrapper } from './components/styleds'
 import TradePrice from './components/TradePrice'
@@ -44,6 +48,7 @@ import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useAppro
 import { useSwapCallback } from '../../hooks/useSwapCallback'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { Field } from '../../state/swap/actions'
+import FormattedPriceImpact from './components/FormattedPriceImpact'
 import {
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
@@ -134,6 +139,7 @@ export default function Swap() {
     })
 
   const { account, chainId } = useActiveWeb3React()
+  const { toastError } = useToast()
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
@@ -163,6 +169,11 @@ export default function Swap() {
   } = useWrapCallback(currencies[Field.INPUT], currencies[Field.OUTPUT], typedValue)
   const showWrap: boolean = wrapType !== WrapType.NOT_APPLICABLE
   const trade = showWrap ? undefined : v2Trade
+
+  const slippageAdjustedAmounts = useMemo(
+    () => computeSlippageAdjustedAmounts(trade, allowedSlippage),
+    [trade, allowedSlippage],
+  )
 
   const parsedAmounts = showWrap
     ? {
@@ -236,7 +247,7 @@ export default function Swap() {
   // the callback to execute the swap
   const { callback: swapCallback, error: swapCallbackError } = useSwapCallback(trade, allowedSlippage, recipient)
 
-  const { priceImpactWithoutFee } = computeTradePriceBreakdown(trade)
+  const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade)
 
   const [singleHopOnly] = useUserSingleHopOnly()
 
@@ -247,6 +258,7 @@ export default function Swap() {
     if (!swapCallback) {
       return
     }
+
     setSwapState({ attemptingTxn: true, tradeToConfirm, swapErrorMessage: undefined, txHash: undefined })
     swapCallback()
       .then((hash) => {
@@ -343,6 +355,8 @@ export default function Swap() {
     <ImportTokenWarningModal tokens={importTokensNotInDefault} onCancel={() => router.push('/swap')} />,
   )
 
+  const totalFeePercent = `${(TOTAL_FEE * 100).toFixed(2)}%`
+
   useEffect(() => {
     if (importTokensNotInDefault.length > 0) {
       onPresentImportTokenWarningModal()
@@ -437,6 +451,7 @@ export default function Swap() {
                       onCurrencySelect={handleInputSelect}
                       otherCurrency={currencies[Field.OUTPUT]}
                       id="swap-currency-input"
+                      showCommonBases
                     />
                     <AutoColumn >
                       <AutoRow justify='flex-start' style={{ padding: '0 1rem' }} mt="16px" mb="16px">
@@ -458,7 +473,7 @@ export default function Swap() {
                               <Skeleton width="100%" ml="8px" height="24px" />
                             ) : (
                                 <TradePrice
-                                  price={trade?.executionPrice}
+                                  price={trade?.executionPrice.invert()}
                                   showInverted={showInverted}
                                   setShowInverted={setShowInverted}
                                 />
@@ -476,10 +491,12 @@ export default function Swap() {
                       onCurrencySelect={handleOutputSelect}
                       otherCurrency={currencies[Field.INPUT]}
                       id="swap-currency-output"
+                      showCommonBases
                     />
 
                     {showWrap ? null : (
-                      <AutoColumn gap="7px" style={{ padding: '0px 0px', marginTop: "32px", marginBottom: "8px" }}>
+                      <>
+                        <AutoColumn gap="7px" style={{ padding: '0px 0px', marginTop: "32px", marginBottom: "8px" }}>
                         <RowBetween align="center">
                           <Label>{t('Slippage tolerance')}</Label>
                           <Text bold color="#177DDC">
@@ -493,6 +510,62 @@ export default function Swap() {
                           </Text>
                         </RowBetween>
                       </AutoColumn>
+
+                      {
+                        trade && (
+                          <>
+                            <Flex style={{backgroundColor:'#23353B', height:1,width:'100%',margin:'7px 0px'}}/>
+                            <RowBetween>
+                            <RowFixed mt="8px">
+                            <Label>
+                            {trade.tradeType === TradeType.EXACT_INPUT ? t('Minimum received') : t('Maximum sold')}
+                              </Label>
+                              <QuestionHelper
+                                text={t(
+                                  'Your transaction will revert if there is a large, unfavorable price movement before it is confirmed.',
+                                )}
+                                ml="15px"
+                              />
+                            </RowFixed>
+                            <RowFixed mt="8px">
+                              <Text fontSize="14px">
+                                {trade.tradeType === TradeType.EXACT_INPUT
+                                  ? slippageAdjustedAmounts[Field.OUTPUT]?.toSignificant(4) ?? '-'
+                                  : slippageAdjustedAmounts[Field.INPUT]?.toSignificant(4) ?? '-'}
+                              </Text>
+                              <Text fontSize="14px" marginLeft="4px">
+                                {trade.tradeType === TradeType.EXACT_INPUT
+                                  ? trade.outputAmount.currency.symbol
+                                  : trade.inputAmount.currency.symbol}
+                              </Text>
+                            </RowFixed>
+                            </RowBetween>
+                            <RowBetween>
+                            <RowFixed mt="8px">
+                            <Label>{t('Price Impact')}</Label>
+                              <QuestionHelper
+                                text={t('The difference between the market price and your price due to trade size.')}
+                                ml="15px"
+                              />
+                            </RowFixed>
+                            <FormattedPriceImpact priceImpact={priceImpactWithoutFee} />
+                            </RowBetween>
+                            <RowBetween>
+                            <RowFixed mt="8px">
+                            <Label>{t('Liquidity Provider Fees')}</Label>
+                              <QuestionHelper
+                                text={t('For each trade a %amount% fee is paid', { amount: totalFeePercent })}
+                                ml="15px"
+                              />
+                            </RowFixed>
+                            <Text fontSize="14px">
+                              {realizedLPFee ? `${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}` : '-'}
+                            </Text>
+                            </RowBetween>
+                          </>
+                        )
+                      }
+                      </>
                     )}
                   </AutoColumn>
                   <Box mt="16px">
@@ -533,6 +606,15 @@ export default function Swap() {
                         <SwapButton
                           variant={isValid && priceImpactSeverity > 2 ? 'danger' : 'primary'}
                           onClick={() => {
+                            const inputAmount = trade.inputAmount.toSignificant(3)
+                            const outputAmount = trade.outputAmount.toSignificant(3)
+
+                            if (!isValidAmount(trade.inputAmount.currency, +inputAmount)
+                              || !isValidAmount(trade.outputAmount.currency, +outputAmount)) {
+                              toastError('', `Minimum amount must be ${process.env.NEXT_PUBLIC_MINIMUM_GLCH} GLCH`)
+                              return;
+                            }
+
                             setSwapState({
                               tradeToConfirm: trade,
                               attemptingTxn: false,
@@ -560,6 +642,15 @@ export default function Swap() {
                         <SwapButton
                           variant={isValid && priceImpactSeverity > 2 && !swapCallbackError ? 'danger' : 'primary'}
                           onClick={() => {
+                            const inputAmount = trade.inputAmount.toSignificant(3)
+                            const outputAmount = trade.outputAmount.toSignificant(3)
+
+                            if (!isValidAmount(trade.inputAmount.currency, +inputAmount)
+                              || !isValidAmount(trade.outputAmount.currency, +outputAmount)) {
+                              toastError('', `Minimum amount must be ${process.env.NEXT_PUBLIC_MINIMUM_GLCH} GLCH`)
+                              return;
+                            }
+
                             setSwapState({
                               tradeToConfirm: trade,
                               attemptingTxn: false,

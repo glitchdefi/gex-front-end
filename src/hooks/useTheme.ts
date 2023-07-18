@@ -10,7 +10,6 @@ const useTheme = () => {
   const { resolvedTheme, setTheme } = useNextTheme()
   // const theme = useContext(StyledThemeContext)
   const theme = useContext(StyledThemeContext)
-  console.log('@theme', theme)
 
   const handleSwitchTheme = (themeValue: 'light' | 'dark') => {
     try {

@@ -275,19 +275,11 @@ export const useFetchPairPrices = ({
   timeWindow,
   currentSwapPrice,
 }: useFetchPairPricesParams) => {
-  console.log('@useFetchPairPrices2')
   const [pairId, setPairId] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const pairData = useSelector(pairByDataIdSelector({ pairId, timeWindow }))
   const derivedPairData = useSelector(derivedPairByDataIdSelector({ pairId, timeWindow }))
   const dispatch = useDispatch()
-
-  console.log('@pairId', pairId)
-
-  console.log('@isLoading', isLoading)
-  console.log('@useFetchPairPrices', {
-
-  })
 
   useEffect(() => {
     const fetchDerivedData = async () => {
@@ -295,14 +287,12 @@ export const useFetchPairPrices = ({
         '[Price Chart]: Not possible to retrieve price data from single pool, trying to fetch derived prices',
       )
       try {
-        console.log('@fetchDerivedData')
         // Try to get at least derived data for chart
         // This is used when there is no direct data for pool
         // i.e. when multihops are necessary
         // const derivedData = await fetchDerivedPriceData(token0Address, token1Address, timeWindow)
         // * FIXME:
         const derivedData = null
-        console.log('@derivedData', derivedData)
         if (derivedData) {
           const normalizedDerivedData = normalizeDerivedChartData(derivedData)
           dispatch(updateDerivedPairData({ pairData: normalizedDerivedData, pairId, timeWindow }))
@@ -318,10 +308,8 @@ export const useFetchPairPrices = ({
     }
 
     const fetchAndUpdatePairPrice = async () => {
-      console.log('@fetchAndUpdatePairPrice')
       setIsLoading(true)
       const { data } = await fetchPairPriceData({ pairId, timeWindow })
-      console.log('@data3', data)
 
       if (data) {
         // Find out if Liquidity Pool has enough liquidity
@@ -331,8 +319,6 @@ export const useFetchPairPrices = ({
         // const hasEnoughLiquidity = pairHasEnoughLiquidity(data, timeWindow)
         const hasEnoughLiquidity = true
         const newPairData = normalizeChartData(data, timeWindow) || []
-        console.log('@newPairData', newPairData)
-        console.log('@hasEnoughLiquidity', hasEnoughLiquidity)
 
         if (newPairData.length > 0 && hasEnoughLiquidity) {
           dispatch(updatePairData({ pairData: newPairData, pairId, timeWindow }))
@@ -366,12 +352,9 @@ export const useFetchPairPrices = ({
   useEffect(() => {
     const updatePairId = () => {
       try {
-        console.log('@token0Address', token0Address)
-        console.log('@token1Address', token1Address)
         // * FIXME:
         const pairAddress = getLpAddress(token0Address, token1Address)?.toLowerCase() || '0xe83413d2ce0c9a02f5357d45a6deebb4e756981a'
         // const pairAddress = getLpAddress(token0Address, token1Address)?.toLowerCase()
-        // console.log('@pairAddress', pairAddress)
         if (pairAddress !== pairId) {
           setPairId(pairAddress)
         }

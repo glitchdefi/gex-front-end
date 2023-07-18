@@ -149,7 +149,9 @@ const GasSettings = () => {
         <CustomInputWrapper
           isActive={gasPriceMeta.label === 'custom'}
           onClick={() => {
-            setGasPrice(parseUnits(`${customGasPrice}`, 'gwei').toString())
+            if (customGasPrice || +customGasPrice === 0) {
+              setGasPrice(parseUnits(`${customGasPrice}`, 'gwei').toString())
+            }
           }}
         >
           <span>
@@ -159,17 +161,18 @@ const GasSettings = () => {
               <Input
                 scale="sm"
                 inputMode="numeric"
-                pattern="^[0-9]+$"
+                pattern="^[0-9]*[.,]?[0-9]{0,2}$"
                 placeholder="0"
                 value={customGasPrice}
                 onChange={(event) => {
-                  if (!event.target.value) {
+                  if (!event.currentTarget.validity.valid) {
                     return
                   }
 
-                  console.log('@event.target.value', event.target.value)
-                  setCustomGasPrice(event.target.value as any)
-                  setGasPrice(parseUnits(event.target.value, 'gwei').toString())
+                  setCustomGasPrice(event.target.value)
+                  if (event.target.value) {
+                    setGasPrice(parseUnits(event.target.value, 'gwei').toString())
+                  }
                 }}
               />
 
@@ -181,6 +184,12 @@ const GasSettings = () => {
             </div>
         </CustomInputWrapper>
       </ButtonWrapper>
+
+      {+customGasPrice === 0 && (
+        <Text fontSize="14px" color="#F3841E" mt="10px">
+          {t('Your transaction may fail')}
+        </Text>
+      )}
     </Flex>
   )
 }

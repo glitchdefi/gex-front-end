@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { connectorLocalStorageKey, ConnectorNames } from '@pancakeswap/uikit'
+import { connectorLocalStorageKey, walletLocalConnectStorageKey, ConnectorNames } from '@pancakeswap/uikit'
 import useAuth from 'hooks/useAuth'
 import { isMobile } from 'react-device-detect'
 import { injected } from 'utils/web3React'
@@ -48,16 +48,36 @@ const safeGetLocalStorageItem = () => {
   }
 }
 
+const safeGetWalletStatusLocalStorage = (): string => {
+  try {
+    return (
+      typeof window?.localStorage?.getItem === 'function' &&
+      (window?.localStorage?.getItem(walletLocalConnectStorageKey) as ConnectorNames)
+    )
+  } catch (err: any) {
+    // Ignore Local Storage Browser error
+    // - NS_ERROR_FILE_CORRUPTED
+    // - QuotaExceededError
+    console.error(`Local Storage error: ${err?.message}`)
+
+    return null
+  }
+}
+
 const useEagerConnect = () => {
   const { login } = useAuth()
-
   useEffect(() => {
+    const isConnecting = !!(safeGetWalletStatusLocalStorage() === 'connected')
+
+    if (!isConnecting) {
+      return
+    }
+
     const tryLogin = (c: ConnectorNames) => {
-      setTimeout(() => login(c))
+      setTimeout(() => login(c), 2000)
     }
 
     const connectorId = safeGetLocalStorageItem()
-
     if (connectorId) {
       const isConnectorBinanceChain = connectorId === ConnectorNames.BSC
       const isBinanceChainDefined = Reflect.has(window, 'BinanceChain')

@@ -18,7 +18,6 @@ import pairHourDatasByIds from '../queries/pairHourDatasByIds'
 import lastPairHourId from '../queries/lastPairHourId'
 
 const fetchPairPriceData = async ({ pairId, timeWindow }: fetchPairDataParams) => {
-  console.log('@fetchPairPriceData')
   const client = infoClient
 
   try {

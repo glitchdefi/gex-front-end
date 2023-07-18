@@ -1,6 +1,7 @@
 import capitalize from "lodash/capitalize";
 import { useState, useEffect } from 'react'
-import { JSBI, Pair, Percent, Fraction, Currency } from '@pancakeswap/sdk'
+import { BigNumber } from '@ethersproject/bignumber'
+import { JSBI, Pair, Percent, Fraction, Currency, sqrt, MINIMUM_LIQUIDITY, CurrencyAmount } from '@pancakeswap/sdk'
 import {
   Button,
   Text,
@@ -20,7 +21,7 @@ import { Field } from 'state/burn/actions'
 import styled from 'styled-components'
 import { NextLinkFromReactRouter } from 'components/NextLink'
 import { useTranslation } from 'contexts/Localization'
-import { useGasPriceMeta } from 'state/user/hooks'
+import { useGasPriceMeta, useUserSlippageTolerance } from 'state/user/hooks'
 import useTotalSupply from 'hooks/useTotalSupply'
 import useBUSDPrice from 'hooks/useBUSDPrice'
 import { multiplyPriceByAmount } from 'utils/prices'
@@ -30,12 +31,13 @@ import CircleLoader from 'components/Loader/CircleLoader'
 import { ApprovalState } from 'hooks/useApproveCallback'
 import { usePendingTransactions } from 'state/transactions/hooks'
 
+
 import Page from 'components/Layout/Page'
 import { AppBody, AppForm } from 'components/App'
 
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { currencyId } from '../../utils/currencyId'
-import { unwrappedToken } from '../../utils/wrappedCurrency'
+import { unwrappedToken, wrappedCurrency } from '../../utils/wrappedCurrency'
 
 import { LightCard } from '../Card'
 import { AutoColumn } from '../Layout/Column'
@@ -316,6 +318,9 @@ interface AddMoreLiquidityProps extends CardProps {
   price: Fraction
   noLiquidity?: boolean
   currencies: { [field in Field]?: Currency }
+  tokenAmountA: any
+  tokenAmountB: any
+  shareOfPool: any
 }
 
 export const useLPValues = (account, pair, currency0, currency1) => {
@@ -363,11 +368,15 @@ export function ConfirmAddMoreLiquidity({
   price,
   noLiquidity,
   currencies,
+  tokenAmountA,
+  tokenAmountB,
+  shareOfPool,
 }: AddMoreLiquidityProps) {
   const { t } = useTranslation()
   const { account } = useWeb3React()
   const { hasPendingTransactions } = usePendingTransactions()
   const gasPriceMeta = useGasPriceMeta();
+  const [userSlippageTolerance] = useUserSlippageTolerance()
 
   const currencyA = noLiquidity ? currencies[Field.CURRENCY_A] : unwrappedToken(pair.token0)
   const currencyB = noLiquidity ? currencies[Field.CURRENCY_B] : unwrappedToken(pair.token1)
@@ -383,6 +392,9 @@ export function ConfirmAddMoreLiquidity({
     token0Deposited: 0,
     token1Deposited: 0,
   }
+
+  const liquidityMintedFirstAddRaw = JSBI.subtract(sqrt(JSBI.multiply(tokenAmountA.raw, tokenAmountB.raw)), MINIMUM_LIQUIDITY)
+  const liquidityMintedFirstAdd = CurrencyAmount.ether(liquidityMintedFirstAddRaw).toSignificant(6);
 
   return (
     <Page>
@@ -413,11 +425,11 @@ export function ConfirmAddMoreLiquidity({
                   currency1={currencyB}
                   size={24}
                 />                
-                <span className="value">{liquidityMinted?.toSignificant(6)}</span>
+                <span className="value">{liquidityMinted ? liquidityMinted?.toSignificant(6) : liquidityMintedFirstAdd || '-'}</span>
                 <span>{currencyA?.symbol}/{currencyB?.symbol} pool tokens</span>
               </div>
               <div className="meta">
-                Output is estimated. If the price changes by more than 1% your transaction will revert.
+                {`Output is estimated. If the price changes by more than ${(userSlippageTolerance / 100).toFixed(2)}% your transaction will revert.`}
               </div>
           </StyledReceivedSection>
 
@@ -427,7 +439,7 @@ export function ConfirmAddMoreLiquidity({
                 !!noLiquidity && <span className="highlight">100%</span>
               }
               {
-                !noLiquidity && <span className="highlight">{poolTokenPercentage ? `${poolTokenPercentage.toFixed(6)}%` : '-'}</span>
+                !noLiquidity && <span className="highlight">{shareOfPool}%</span>
               }
             </div>
             <div className="row">
@@ -452,15 +464,15 @@ export function ConfirmAddMoreLiquidity({
             <div className="row">
               <span><CurrencyLogo currency={currencyA} size='18px' style={{
                 marginRight: '8px'
-              }} />{currencyA?.symbol} deposited</span>
-              <span className="value">{token0Deposited ? `${token0Deposited.toSignificant(6)} ${currencyA?.symbol}` : '-'}</span>
+              }} />{currencyA?.symbol} to be deposited</span>
+              <span className="value">{tokenAmountA ? `${tokenAmountA.toSignificant(6)} ${currencyA?.symbol}` : '-'}</span>
             </div>
 
             <div className="row">
               <span><CurrencyLogo currency={currencyB} size='18px' style={{
                 marginRight: '8px'
-              }} />{currencyB?.symbol} deposited</span>
-              <span className="value">{token1Deposited ? `${token1Deposited.toSignificant(6)} ${currencyB?.symbol}` : '-'}</span>
+              }} />{currencyB?.symbol} to be deposited</span>
+              <span className="value">{tokenAmountB ? `${tokenAmountB.toSignificant(6)} ${currencyB?.symbol}` : '-'}</span>
             </div>
 
             {

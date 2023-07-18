@@ -303,13 +303,13 @@ const ConfirmSwapDetails: React.FC<InjectedModalProps & ConfirmSwapDetailsProps>
             {allowedSlippage / 100}%
                           </Text>
         </RowBetween>
-        <RowBetween align="center">
+        <RowBetween align="center" mt="8px" mb="8px">
           <Label>Transaction Speed</Label>
             <Text bold color="#177DDC">
             {`${capitalize(gasPriceMeta.label)} - ${gasPriceMeta.gasPrice} GWEI`}
             </Text>
           </RowBetween>
-          <Flex style={{backgroundColor:'#23353B', height:1,width:'100%',margin:'7px 0px'}}/>
+          <Flex style={{backgroundColor:'#23353B', height:1,width:'100%',margin:'8px 0px'}}/>
 
           {/* <RowBetween align="center" mt="8px">
           <Label>{t('Price')}</Label>

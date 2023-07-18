@@ -168,10 +168,6 @@ const UserMenu: React.FC<UserMenuProps> = ({
     };
   }, [targetRef, tooltipRef, setIsOpen]);
 
-  console.log('@isWrongNetwork', isWrongNetwork);
-  console.log('@account', account);
-  console.log('@text', text);
-
   return (
     <StyledMenu>
       {
@@ -182,7 +178,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
       {
         !isWrongNetwork &&
           <StyledNetwork>
-            <img src="images/gex-icon.svg" alt="Glitch Icon" width="16px" />
+            <img src={`${process.env.NEXT_PUBLIC_GLITCH_DOMAIN_URL}/images/gex-icon.svg`} alt="Glitch Icon" width="16px" />
             {chainName}
           </StyledNetwork>
       }
@@ -198,7 +194,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
               <LabelText>
                 <span>{bnbBalance ? formatBigNumber(bnbBalance, 6) : 0} GLCH</span>
                 <div className="divider" />
-                <img src="images/avatar-icon.svg" alt="avatar" />
+                <img src={`${process.env.NEXT_PUBLIC_GLITCH_DOMAIN_URL}/images/avatar-icon.svg`} alt="avatar" />
                 <span className="user-address">{text || accountEllipsis}</span>
               </LabelText>
             </StyledUserMenu>

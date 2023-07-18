@@ -51,13 +51,7 @@ export function useTokenBalancesWithLoadingIndicator(
     [tokens],
   )
 
-  console.log('@useTokenBalancesWithLoadingIndicator')
-  console.log('@address', address);
-  console.log('@tokens', tokens);
-  console.log('@validatedTokens', validatedTokens);
-
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
-  console.log('@validatedTokenAddresses', validatedTokenAddresses)
 
   const balances = useMultipleContractSingleData(
     [...validatedTokenAddresses],
@@ -65,8 +59,6 @@ export function useTokenBalancesWithLoadingIndicator(
     'balanceOf',
     useMemo(() => [address], [address]),
   )
-
-  console.log('@balances', balances)
 
   const anyLoading: boolean = useMemo(() => balances.some((callState) => callState.loading), [balances])
 
@@ -136,7 +128,6 @@ export function useCurrencyBalance(account?: string, currency?: Currency): Curre
 // mimics useAllBalances
 export function useAllTokenBalances(): { [tokenAddress: string]: TokenAmount | undefined } {
   const { account } = useWeb3React()
-  console.log('@account', account);
 
   const allTokens = useAllTokens()
   const allTokensArray = useMemo(() => Object.values(allTokens ?? {}), [allTokens])

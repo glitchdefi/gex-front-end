@@ -1,8 +1,7 @@
-import { parseUnits, formatUnits } from '@ethersproject/units'
-import { ChainId, Pair, Token } from '@pancakeswap/sdk'
+import { formatUnits } from '@ethersproject/units'
+import { Pair, Token } from '@pancakeswap/sdk'
 import { differenceInDays } from 'date-fns'
 import flatMap from 'lodash/flatMap'
-import farms from 'config/constants/farms'
 import { useCallback, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from 'config/constants'
@@ -403,9 +402,7 @@ export function useRemoveUserAddedToken(): (chainId: number, address: string) =>
 
 export function useGasPrice(): string {
   const { chainId } = useActiveWeb3React()
-  console.log('@chainId', chainId);
   const userGas = useSelector<AppState, AppState['user']['gasPrice']>((state) => state.user.gasPrice)
-  console.log('@userGas', userGas);
 
   // return chainId === ChainId.BSC ? userGas : GAS_PRICE_GWEI.testnet
   return userGas;
@@ -484,14 +481,13 @@ export function useTrackedTokenPairs(): [Token, Token][] {
 
   // pinned pairs
   const pinnedPairs = useMemo(() => (chainId ? PINNED_PAIRS[chainId] ?? [] : []), [chainId])
-
-  const farmPairs: [Token, Token][] = useMemo(
-    () =>
-      farms
-        .filter((farm) => farm.pid !== 0)
-        .map((farm) => [deserializeToken(farm.token), deserializeToken(farm.quoteToken)]),
-    [],
-  )
+  // const farmPairs: [Token, Token][] = useMemo(
+  //   () =>
+  //     farms
+  //       .filter((farm) => farm.pid !== 0)
+  //       .map((farm) => [deserializeToken(farm.token), deserializeToken(farm.quoteToken)]),
+  //   [],
+  // )
 
   // pairs for every token against every base
   const generatedPairs: [Token, Token][] = useMemo(
@@ -531,8 +527,8 @@ export function useTrackedTokenPairs(): [Token, Token][] {
   }, [savedSerializedPairs, chainId])
 
   const combinedList = useMemo(
-    () => userPairs.concat(generatedPairs).concat(pinnedPairs).concat(farmPairs),
-    [generatedPairs, pinnedPairs, userPairs, farmPairs],
+    () => userPairs.concat(generatedPairs).concat(pinnedPairs),
+    [generatedPairs, pinnedPairs, userPairs],
   )
 
   return useMemo(() => {

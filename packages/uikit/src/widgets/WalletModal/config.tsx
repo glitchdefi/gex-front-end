@@ -89,5 +89,6 @@ const connectors: Config[] = [
 export default connectors;
 export const connectorLocalStorageKey = "connectorIdv2";
 export const walletLocalStorageKey = "wallet";
+export const walletLocalConnectStorageKey = "wallet-connect";
 
 export const walletConnectConfig = connectors.find((c) => c.title === "WalletConnect");

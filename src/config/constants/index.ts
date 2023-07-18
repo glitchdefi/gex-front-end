@@ -1,20 +1,10 @@
 // used to construct the list of all pairs we consider by default in the frontend
 import { ChainId, Token } from '@pancakeswap/sdk'
-import { bscTokens, bscTestnetTokens, glitchTokens } from './tokens'
-import { ChainTokenList } from './types'
-// * FIXME:
-export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
-  [ChainId.BSC]: [bscTokens.wbnb, bscTokens.dai, bscTokens.busd, bscTokens.usdt],
-  [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+import { glitchTokens } from './tokens'
+export const BASES_TO_TRACK_LIQUIDITY_FOR = {
   [ChainId.GLITCH]: [glitchTokens.wglch, glitchTokens.usdt],
 }
-// * FIXME:
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
-  // [ChainId.BSC]: [
-  //   [bscTokens.cake, bscTokens.wbnb],
-  //   [bscTokens.busd, bscTokens.usdt],
-  //   [bscTokens.dai, bscTokens.usdt],
-  // ],
   [ChainId.GLITCH]: [
     [glitchTokens.wglch, glitchTokens.usdt],
   ],
@@ -34,7 +24,7 @@ export const BLOCKED_ADDRESSES: string[] = [
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 50
 // 20 minutes, denominated in seconds
-export const DEFAULT_DEADLINE_FROM_NOW = 60 * 20
+export const DEFAULT_DEADLINE_FROM_NOW = 60 * 25
 
 export { default as farmsConfig } from './farms'
 export { default as poolsConfig } from './pools'

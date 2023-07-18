@@ -9,7 +9,6 @@ const getLpAddress = (token1: string | Token, token2: string | Token, chainId: n
   }
   if (typeof token1 === 'string' || token1 instanceof String) {
     const checksummedToken1Address = isAddress(token1)
-    console.log('@checksummedToken1Address', checksummedToken1Address)
     if (!checksummedToken1Address) {
       return null
     }
@@ -24,7 +23,6 @@ const getLpAddress = (token1: string | Token, token2: string | Token, chainId: n
   }
 
   const pairAddress = Pair.getAddress(token1AsTokenInstance as Token, token2AsTokenInstance as Token)
-  console.log('@pairAddress', pairAddress)
 
   return Pair.getAddress(token1AsTokenInstance as Token, token2AsTokenInstance as Token)
 }

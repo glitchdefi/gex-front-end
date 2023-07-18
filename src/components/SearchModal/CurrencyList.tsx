@@ -26,7 +26,7 @@ function currencyKey(currency: Currency): string {
 const StyledBalanceText = styled(Text)`
   white-space: nowrap;
   overflow: hidden;
-  max-width: 5rem;
+  max-width: 14rem;
   text-overflow: ellipsis;
 `
 
@@ -39,7 +39,7 @@ const FixedContentRow = styled.div`
 `
 
 function Balance({ balance }: { balance: CurrencyAmount }) {
-  return <StyledBalanceText title={balance.toExact()}>{balance.toSignificant(4)}</StyledBalanceText>
+  return <StyledBalanceText title={balance.toExact()}>{balance.toSignificant(18)}</StyledBalanceText>
 }
 
 const MenuItem = styled(RowBetween)<{ disabled: boolean; selected: boolean;index:any }>`
@@ -212,6 +212,9 @@ export default function CurrencyList({
       itemCount={itemData.length}
       itemSize={56}
       itemKey={itemKey}
+      style={{
+        paddingBottom: '40px'
+      }}
     >
       {Row}
     </FixedSizeList>

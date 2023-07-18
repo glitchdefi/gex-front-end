@@ -180,7 +180,6 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
 }
 
 export function useCurrency(currencyId: string | undefined): Currency | Token | null | undefined {
-  console.log('@currencyId', currencyId)
   const isGLCH = currencyId?.toUpperCase() === 'GLCH' || currencyId?.toLowerCase() === GELATO_NATIVE
   const token = useToken(isGLCH ? undefined : currencyId)
   return isGLCH ? ETHER : token

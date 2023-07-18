@@ -1,7 +1,6 @@
 import { ChainId, JSBI, Percent, Token } from '@pancakeswap/sdk'
 import { BigNumber } from '@ethersproject/bignumber'
-import { bscTokens, bscTestnetTokens, glitchTokens } from './tokens'
-import { ChainTokenList } from './types'
+import { bscTokens, glitchTokens } from './tokens'
 
 export const ROUTER_ADDRESS = {
   [ChainId.BSC]: '0x10ED43C718714eb63d5aA57B78B54704E256024E',
@@ -11,18 +10,9 @@ export const ROUTER_ADDRESS = {
 
 // * FIXME:
 // used to construct intermediary pairs for trading
-export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.BSC]: [
-    bscTokens.wbnb,
-    bscTokens.cake,
-    bscTokens.busd,
-    bscTokens.usdt,
-    bscTokens.btcb,
-    bscTokens.eth,
-    bscTokens.usdc,
-  ],
-  [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
-  [ChainId.GLITCH]: [glitchTokens.wglch, glitchTokens.usdt],
+export const BASES_TO_CHECK_TRADES_AGAINST: any = {
+  // [ChainId.GLITCH]: [glitchTokens.wglch, glitchTokens.usdt],
+  [ChainId.GLITCH]: [],
 }
 
 /**
@@ -44,17 +34,13 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 
 // * FIXME:
 // used for display in the default list when adding liquidity
-export const SUGGESTED_BASES: ChainTokenList = {
-  [ChainId.BSC]: [bscTokens.busd, bscTokens.cake, bscTokens.btcb],
-  [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+export const SUGGESTED_BASES: any = {
   [ChainId.GLITCH]: [glitchTokens.wglch, glitchTokens.usdt],
 }
 
 // * FIXME:
 // used to construct the list of all pairs we consider by default in the frontend
-export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
-  [ChainId.BSC]: [bscTokens.wbnb, bscTokens.dai, bscTokens.busd, bscTokens.usdt],
-  [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+export const BASES_TO_TRACK_LIQUIDITY_FOR: any = {
   [ChainId.GLITCH]: [glitchTokens.wglch, glitchTokens.usdt],
 }
 
@@ -88,15 +74,10 @@ export const BETTER_TRADE_LESS_HOPS_THRESHOLD = new Percent(JSBI.BigInt(50), BIP
 export const ZERO_PERCENT = new Percent('0')
 export const ONE_HUNDRED_PERCENT = new Percent('1')
 
-export const BASE_FEE = new Percent(JSBI.BigInt(25), BIPS_BASE)
+export const BASE_FEE = new Percent(JSBI.BigInt(30), BIPS_BASE)
 export const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE)
 
-// * FIXME:
-// BNB
 export const DEFAULT_INPUT_CURRENCY = 'GLCH'
-// CAKE
-// export const DEFAULT_OUTPUT_CURRENCY = '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82'
-// * USDT Testnet
 export const DEFAULT_OUTPUT_CURRENCY = process.env.NEXT_PUBLIC_GLITCH_DEFAULT_OUTPUT_TOKEN || '0xDf8479ABf17b60DCe07D88B43Fd9f246BEC927F2'
 
 // Handler string is passed to Gelato to use PCS router

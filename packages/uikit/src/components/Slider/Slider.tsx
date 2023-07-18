@@ -45,11 +45,6 @@ const Slider: React.FC<SliderProps> = ({
   // eslint-disable-next-line prefer-const
   progressWidth = `${progressPercentage}%`;
 
-  console.log('@progressPercentage', progressPercentage);
-  console.log('@progressWidth', progressWidth);
-
-  console.log('@value', value);
-
   const labelProgress = isMax ? "calc(100% - 0px)" : `${progressPercentage}%`;
   const displayValueLabel = isMax ? "MAX" : valueLabel;
   return (

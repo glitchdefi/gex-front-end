@@ -11,7 +11,6 @@ import { glitchRpcProvider } from 'utils/providers'
  */
 const useActiveWeb3React = (): Web3ReactContextInterface<Web3Provider> => {
   const { library, chainId, ...web3React } = useWeb3React()
-
   return { library: library ?? glitchRpcProvider, chainId: chainId ?? ChainId.GLITCH, ...web3React }
 }
 

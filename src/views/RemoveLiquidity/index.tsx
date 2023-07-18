@@ -19,6 +19,7 @@ import { getZapAddress } from 'utils/addressHelpers'
 import { useTranslation } from 'contexts/Localization'
 import { ROUTER_ADDRESS } from 'config/constants/exchange'
 import { transactionErrorToUserReadableMessage } from 'utils/transactionErrorToUserReadableMessage'
+import isValidAmount from 'utils/isValidAmount'
 import { AutoColumn } from '../../components/Layout/Column'
 import { PooledSummaryCard, ConfirmRemoveLiquidCard } from '../../components/PositionCard'
 import { AppHeader, AppBody, AppForm } from '../../components/App'
@@ -523,6 +524,15 @@ export default function RemoveLiquidity() {
                         : 'primary'
                     }
                     onClick={() => {
+                      const inputAmount = parsedAmounts[Field.CURRENCY_A]?.toSignificant(3)
+                      const outputAmount = parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)
+
+                      if (!isValidAmount(currencyA, +inputAmount)
+                        || !isValidAmount(currencyB, +outputAmount)) {
+                        toastError('', `Minimum amount must be ${process.env.NEXT_PUBLIC_MINIMUM_GLCH} GLCH`)
+                        return;
+                      }
+
                       setLiquidityState({
                         attemptingTxn: false,
                         liquidityErrorMessage: undefined,

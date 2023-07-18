@@ -66,7 +66,7 @@ const GexFooter: React.FC<{ isDark: boolean }> = ({ isDark }) => {
   //   Number.isFinite(+value) ? +value : undefined,
   // )
   const price = useBNBBusdPrice()
-  const usdtPricePerGLCH = price?.invert().toSignificant(6)
+  const usdtPricePerGLCH = price?.toSignificant(6)
 
   return (
     <StyledFooter>

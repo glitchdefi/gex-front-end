@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { KeyboardEvent, RefObject, useCallback, useMemo, useRef, useState, useEffect } from 'react'
 import { Currency, ETHER, Token } from '@pancakeswap/sdk'
-import { Flex,Text, Input, Box, Button, Image, useMatchBreakpointsContext } from '@pancakeswap/uikit'
+import { Flex,Text, Input, Box, Button, useMatchBreakpointsContext } from '@pancakeswap/uikit'
 import { useTranslation } from 'contexts/Localization'
 import { FixedSizeList } from 'react-window'
 import { useAudioModeManager } from 'state/user/hooks'
@@ -17,7 +17,6 @@ import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { useSortedTokensByQuery, createFilterToken } from './filtering'
 import useTokenComparator from './sorting'
-import { getSwapSound } from './swapSound'
 
 import ImportRow from './ImportRow'
 
@@ -107,7 +106,7 @@ function CurrencySearch({
 
   const showBNB: boolean = useMemo(() => {
     const s = debouncedQuery.toLowerCase().trim()
-    return s === '' || s === 't' || s === 'tu' || s === 'tus'
+    return s === '' || s === 'g' || s === 'gl' || s === 'glc' || s === 'glch'
   }, [debouncedQuery])
 
   const filteredTokens: Token[] = useMemo(() => {
@@ -126,11 +125,8 @@ function CurrencySearch({
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
       onCurrencySelect(currency)
-      if (audioPlay) {
-        getSwapSound().play()
-      }
     },
-    [audioPlay, onCurrencySelect],
+    [onCurrencySelect],
   )
 
   // manage focus on modal show
@@ -151,7 +147,7 @@ function CurrencySearch({
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         const s = debouncedQuery.toLowerCase().trim()
-        if (s === 'tus') {
+        if (s === 'glch') {
           handleCurrencySelect(ETHER)
         } else if (filteredSortedTokens.length > 0) {
           if (

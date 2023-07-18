@@ -16,9 +16,9 @@ export const clearUserStates = (dispatch: Dispatch<any>, chainId: number, isDeac
     connectorsByName.walletconnect.walletConnectProvider = null
   }
   // Only clear localStorage when user disconnect,switch address no need clear it.
-  if (isDeactive) {
-    window?.localStorage?.removeItem(connectorLocalStorageKey)
-  }
+  // if (isDeactive) {
+  //   window?.localStorage?.removeItem(connectorLocalStorageKey)
+  // }
   const lsOrderKeys = getLocalStorageItemKeys(LS_ORDERS)
   lsOrderKeys.forEach((lsOrderKey) => window?.localStorage?.removeItem(lsOrderKey))
   window?.localStorage?.removeItem(PREDICTION_TOOLTIP_DISMISS_KEY)

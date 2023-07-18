@@ -56,8 +56,6 @@ export class BnInjectedConnector extends InjectedConnector {
         unsupported = this.isChainUnsupported(id)
       }
 
-      console.log('@unsupported', unsupported)
-
       return { account, chain: { id, unsupported }, provider }
     } catch (error) {
       if (this.isUserRejectedRequestError(error)) throw new UserRejectedRequestError(error)

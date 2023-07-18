@@ -19,7 +19,7 @@ const walletconnect = new WalletConnectConnector({
   rpc: {
     [ChainId.BSC]: 'https://bsc-dataseed.binance.org',
     [ChainId.BSC_TESTNET]: 'https://data-seed-prebsc-2-s3.binance.org:8545',
-    [ChainId.GLITCH]: process.env.NEXT_PUBLIC_GLITCH_RPC || 'http://fullnodes-testnet-1.glitch.finance:9933',
+    [ChainId.GLITCH]: process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://rpc-fullnodes-testnet.glitch.finance',
   },
   qrcode: true,
   pollingInterval: POLLING_INTERVAL,

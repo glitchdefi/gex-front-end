@@ -48,6 +48,10 @@ const ButtonWrapper = styled.div`
       font-size: 14px;
       color: #4F7785;
     }
+
+    .active {
+      border: 1px solid #00E6E6;
+    }
   }
 `;
 
@@ -67,7 +71,9 @@ const SlippageTabs = () => {
   const [userSlippageTolerance, setUserSlippageTolerance] = useUserSlippageTolerance()
   const [ttl, setTtl] = useUserTransactionTTL()
 
-  const [slippageInput, setSlippageInput] = useState('')
+  const defaultSlippageInput = ![10, 30, 50, 100].includes(userSlippageTolerance) ? `${(userSlippageTolerance / 100).toFixed(2)}` : ''
+
+  const [slippageInput, setSlippageInput] = useState(defaultSlippageInput)
   const [deadlineInput, setDeadlineInput] = useState('')
 
   const { t } = useTranslation()
@@ -161,7 +167,7 @@ const SlippageTabs = () => {
           <Text color="#E5ECEF" fontSize="16px" bold>Slippage Tolerance</Text>
             <QuestionHelper
               text={t(
-                'Your transaction will revert if the price changes below this percentage.',
+                'Your transaction will revert if the price changes above this percentage.',
               )}
               placement="top-start"
               ml="4px"
@@ -230,6 +236,7 @@ const SlippageTabs = () => {
                   pattern="^[0-9]*[.,]?[0-9]{0,2}$"
                   placeholder="Custom"
                   value={slippageInput}
+                  className={slippageInput ? 'active' : ''}
                   onBlur={() => {
                     parseCustomSlippage((userSlippageTolerance / 100).toFixed(2))
                   }}
@@ -238,8 +245,6 @@ const SlippageTabs = () => {
                       parseCustomSlippage(event.target.value.replace(/,/g, '.'))
                     }
                   }}
-                  isWarning={!slippageInputIsValid}
-                  isSuccess={![10, 50, 100].includes(userSlippageTolerance)}
                 />
               <Text color="primary" bold ml="2px">
                 %
@@ -248,7 +253,7 @@ const SlippageTabs = () => {
           </ButtonWrapper>
         </Flex>
         {!!slippageError && (
-          <Text fontSize="14px" color={slippageError === SlippageError.InvalidInput ? 'red' : '#F3841E'} mt="8px">
+          <Text fontSize="14px" color={slippageError === SlippageError.InvalidInput ? 'red' : '#F3841E'} mt="10px">
             {slippageError === SlippageError.InvalidInput
               ? t('Enter a valid slippage percentage')
               : slippageError === SlippageError.RiskyLow
@@ -256,6 +261,11 @@ const SlippageTabs = () => {
               : t('Your transaction may fail')}
           </Text>
         )}
+        {/* { slippageInput && !+slippageInput && (
+          <Text fontSize="14px" color="#F3841E" mt="10px">
+            {t('Your transaction may fail')}
+          </Text>
+        )} */}
       </Flex>
     </Flex>
   )

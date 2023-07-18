@@ -13,7 +13,6 @@ import { PairState, usePairs } from './usePairs'
 export default function useBUSDPrice(currency?: Currency): Price | undefined {
   const { chainId = 0 } = useActiveWeb3React()
   const wrapped = wrappedCurrency(currency, chainId)
-  console.log('@chainId123', chainId)
 
   const WBNB = WNATIVE[chainId]
   const busd = BUSD[chainId]

@@ -39,9 +39,9 @@ const NotFound = () => {
   return (
     <Page>
       <StyledNotFound>
-        <img src="/images/glitch-logo.png" height={67} width={140} alt="Glitch logo" />
+        <img src={`${process.env.NEXT_PUBLIC_GLITCH_DOMAIN_URL}/images/glitch-logo.png`} height={67} width={140} alt="Glitch logo" />
         <Text404>
-          <img src="images/404-text.png" alt="404-text" />
+          <img src={`${process.env.NEXT_PUBLIC_GLITCH_DOMAIN_URL}/images/404-text.png`} alt="404-text" />
         </Text404>
         <Text>{t('The page you are looking for can not be found')}</Text>
         <Link href="/" passHref>

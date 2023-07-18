@@ -80,7 +80,6 @@ const fetchDerivedPriceData = async (
   token1Address: string,
   timeWindow: PairDataTimeWindowEnum,
 ) => {
-  console.log('@fetchDerivedPriceData')
   const interval = getInterval(timeWindow)
   const endTimestamp = getUnixTime(new Date())
   const startTimestamp = getUnixTime(startOfHour(sub(endTimestamp * 1000, { days: getSkipDaysToStart(timeWindow) })))
@@ -93,7 +92,6 @@ const fetchDerivedPriceData = async (
 
   try {
     const blocks = await getBlocksFromTimestamps(timestamps, 'asc', 500)
-    console.log('@blocks', blocks)
 
     if (!blocks || blocks.length === 0) {
       console.error('Error fetching blocks for timestamps', timestamps)

@@ -90,7 +90,6 @@ export abstract class Router {
         : `0x${options.deadline.toString(16)}`
 
     const useFeeOnTransfer = Boolean(options.feeOnTransfer)
-    console.log('@useFeeOnTransfer', useFeeOnTransfer)
 
     let methodName: string
     let args: (string | string[])[]

@@ -11,5 +11,5 @@ export const BSC_TESTNET_RPC_URLS = [
 ]
 // * FIXME:
 export const GLITCH_RPC_URLS = [
-  process.env.NEXT_PUBLIC_GLITCH_RPC || 'http://fullnodes-testnet-1.glitch.finance:9933',
+  process.env.NEXT_PUBLIC_GLITCH_RPC || 'https://rpc-fullnodes-testnet.glitch.finance',
 ]

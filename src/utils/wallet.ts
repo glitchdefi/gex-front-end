@@ -30,8 +30,6 @@ const NETWORK_CONFIG = {
  */
 export const setupNetwork = async (chainId?: number, externalProvider?: ExternalProvider) => {
   const provider = externalProvider || window.ethereum
-  console.log('@setupNetwork', chainId)
-
   if (!NETWORK_CONFIG[chainId]) {
     console.error('Invalid chain id')
     return false

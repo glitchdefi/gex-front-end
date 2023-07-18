@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Text, Flex, Button, ArrowBackIcon } from '@pancakeswap/uikit'
 import Link from 'next/link'
@@ -13,12 +13,13 @@ import { currencyId } from '../../utils/currencyId'
 
 import FullPositionCard from '../../components/PositionCard'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
-import { usePairs, PairState } from '../../hooks/usePairs'
-import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
+import { usePair, usePairs, PairState } from '../../hooks/usePairs'
+import { toV2LiquidityToken, useTrackedTokenPairs, usePairAdder } from '../../state/user/hooks'
 import Dots from '../../components/Loader/Dots'
 import { AppBody, AppForm } from '../../components/App'
 import Page from '../Page'
 import ConnectMetaButton from '../../components/ConnectMetaButton'
+import { useCurrency } from '../../hooks/Tokens'
 
 const StyledBody = styled.div`
   display: flex;
@@ -236,6 +237,19 @@ export default function Pool() {
     liquidityTokens,
   )
 
+  const gPairs = window?.localStorage?.getItem('g-pairs') ? JSON.parse(window?.localStorage?.getItem('g-pairs')) : '';
+  const currencyA = useCurrency(gPairs ? gPairs[0] : '')
+  const currencyB = useCurrency(gPairs ? gPairs[1] : '')
+  const [pairState, pair] = usePair(currencyA ?? undefined, currencyB ?? undefined)
+  const addPair = usePairAdder()
+
+  useEffect(() => {
+    if (pair) {
+      addPair(pair)
+    }
+  }, [pair, addPair])
+
+  // * CHECK
   // fetch the reserves for all V2 pools in which the user has a balance
   const liquidityTokensWithBalances = useMemo(
     () =>
@@ -246,12 +260,12 @@ export default function Pool() {
   )
 
   const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
+
   const v2IsLoading =
     fetchingV2PairBalances ||
     v2Pairs?.length < liquidityTokensWithBalances.length ||
     (v2Pairs?.length && v2Pairs.every(([pairState]) => pairState === PairState.LOADING))
 
-  
   
   const allV2PairsWithLiquidity = v2Pairs
     ?.filter(([pairState, pair]) => pairState === PairState.EXISTS && Boolean(pair))
@@ -291,6 +305,7 @@ export default function Pool() {
             if (!Object.keys(payload).length) {
               return;
             }
+
             // eslint-disable-next-line no-console
             setSelectedPairs(payload)
           }}
@@ -353,11 +368,11 @@ export default function Pool() {
                   </span>
                 </div>
                 <div className="item-row">
-                  <span className="currency-wrapper"><CurrencyLogo currency={currency0} size="24px" style={{ marginRight: '8px' }} /> USDT deposited</span>
+                  <span className="currency-wrapper"><CurrencyLogo currency={currency0} size="24px" style={{ marginRight: '8px' }} /> {currency0.symbol} deposited</span>
                   <span className="token-value">{token0Deposited ? token0Deposited.toSignificant(6) : '-'} {currency0.symbol}</span>
                 </div>
                 <div className="item-row">
-                  <span className="currency-wrapper"><CurrencyLogo currency={currency1} size="24px" style={{ marginRight: '8px' }} /> BNB deposited</span>
+                  <span className="currency-wrapper"><CurrencyLogo currency={currency1} size="24px" style={{ marginRight: '8px' }} /> {currency1.symbol} deposited</span>
                   <span className="token-value">{token1Deposited ? token1Deposited.toSignificant(6) : '-'} {currency1.symbol}</span>
                 </div>
               </div>

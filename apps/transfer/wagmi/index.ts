@@ -11,7 +11,6 @@ export const { provider, chains } = configureChains(
   [
     jsonRpcProvider({
       rpc: (chain) => {
-        console.log('@chain', chain);
         // return { http: chain.rpcUrls.default }
         return { http: process.env.NEXT_PUBLIC_GLITCH_RPC }
       },

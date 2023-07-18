@@ -9,7 +9,7 @@ import {
   UserRejectedRequestError as UserRejectedRequestErrorWalletConnect,
   WalletConnectConnector,
 } from '@web3-react/walletconnect-connector'
-import { ConnectorNames, connectorLocalStorageKey, Text, Box, LinkExternal } from '@pancakeswap/uikit'
+import { ConnectorNames, connectorLocalStorageKey, walletLocalConnectStorageKey, Text, Box, LinkExternal } from '@pancakeswap/uikit'
 import { connectorsByName } from 'utils/web3React'
 import { setupNetwork } from 'utils/wallet'
 import useToast from 'hooks/useToast'
@@ -31,11 +31,17 @@ const useAuth = () => {
         typeof connectorOrGetConnector !== 'function' ? connectorsByName[connectorID] : await connectorOrGetConnector()
 
       if (typeof connector !== 'function' && connector) {
-        activate(connector, async (error: Error) => {
+        try {
+          const error: any = await activate(connector)
+          if (!error) {
+            window?.localStorage?.setItem(walletLocalConnectStorageKey, 'connected');
+            return;
+          }
+
           if (error instanceof UnsupportedChainIdError) {
             setError(error)
             const provider = await connector.getProvider()
-            const hasSetup = await setupNetwork(73771, provider)
+            const hasSetup = await setupNetwork(+process.env.NEXT_PUBLIC_GLITCH_CHAIN_ID, provider)
             if (hasSetup) {
               activate(connector)
             }
@@ -64,9 +70,11 @@ const useAuth = () => {
               toastError(error.name, error.message)
             }
           }
-        })
+        } catch (err) {
+          console.error('@err', err)
+        }
       } else {
-        window?.localStorage?.removeItem(connectorLocalStorageKey)
+        // window?.localStorage?.removeItem(connectorLocalStorageKey)
         toastError(t('Unable to find connector'), t('The connector config is wrong'))
       }
     },
@@ -76,6 +84,7 @@ const useAuth = () => {
   const logout = useCallback(() => {
     deactivate()
     clearUserStates(dispatch, chainId, true)
+    window?.localStorage?.removeItem(walletLocalConnectStorageKey)
   }, [deactivate, dispatch, chainId])
 
   return { login, logout }

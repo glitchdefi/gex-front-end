@@ -162,7 +162,7 @@ export default function CurrencyInputPanel({
               style={{ display: 'inline', cursor: 'pointer', color: '#A7C1CA' }}
             >
               {!hideBalance && !!currency
-                ? t('%balance% %currency%', { balance: selectedCurrencyBalance?.toSignificant(4) ?? t('Loading') ,currency:currency.symbol||''})
+                ? t('%balance% %currency%', { balance: selectedCurrencyBalance?.toSignificant(18) ?? t('Loading') ,currency:currency.symbol||''})
                 : ' -'}
             </Text>
           </Flex>
@@ -250,7 +250,7 @@ export default function CurrencyInputPanel({
           ) : null} */}
         </Flex>
         <InputPanel style={{ width: '75%', marginTop: '6px' }}>
-          <Container as="label" zapStyle={zapStyle} error={error}>
+          {/* <Container as="label" zapStyle={zapStyle} error={error}> */}
             <LabelRow>
               <Flex style={{ backgroundColor: '#395660', height: 24, width: 1, marginRight: '16px' }} />
 
@@ -289,7 +289,7 @@ export default function CurrencyInputPanel({
               </Button>
             )} */}
             </InputRow>
-          </Container>
+          {/* </Container> */}
           {disabled && <Overlay />}
         </InputPanel>
       </Flex>

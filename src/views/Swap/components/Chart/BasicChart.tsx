@@ -22,17 +22,12 @@ const BasicChart = ({
   currentSwapPrice,
 }) => {
   const [timeWindow, setTimeWindow] = useState<PairDataTimeWindowEnum>(0)
-  console.log('@currentSwapPrice2', currentSwapPrice)
-
   const { pairPrices = [], pairId } = useFetchPairPrices({
     token0Address,
     token1Address,
     timeWindow,
     currentSwapPrice,
   })
-
-  console.log('@pairPrices', pairPrices)
-  console.log('@pairId', pairId)
 
   const [hoverValue, setHoverValue] = useState<number | undefined>()
   const [hoverDate, setHoverDate] = useState<string | undefined>()
@@ -71,8 +66,6 @@ const BasicChart = ({
       />
     )
   }
-
-  console.log('@pairPrices', pairPrices);
 
   return (
     <>

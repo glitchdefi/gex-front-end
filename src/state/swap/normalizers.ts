@@ -10,8 +10,6 @@ export const normalizeChartData = (
     case PairDataTimeWindowEnum.DAY:
     case PairDataTimeWindowEnum.WEEK:
       return (data as PairHoursDatasResponse)?.pairHourDatas?.map((fetchPairEntry) => {
-        console.log('@fetchPairEntry2', fetchPairEntry)
-
         return {
           time: fetchPairEntry.hourStartUnix,
           token0Id: fetchPairEntry.pair.token0.id,
@@ -23,8 +21,6 @@ export const normalizeChartData = (
     case PairDataTimeWindowEnum.MONTH:
     case PairDataTimeWindowEnum.YEAR:
       return (data as PairDayDatasResponse)?.pairDayDatas?.map((fetchPairEntry) => {
-        console.log('@fetchPairEntry', fetchPairEntry)
-
         return {
           time: fetchPairEntry.date,
           // token0Id: fetchPairEntry.pairAddress.token0.id,

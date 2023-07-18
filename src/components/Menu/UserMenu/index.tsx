@@ -86,10 +86,8 @@ const UserMenu = () => {
 
   // const { chains, switchNetwork } = useSwitchNetwork()
 
-  console.log('@chainId', chainId)
-  console.log('@chains', chains);
-
-  const selectedChain = chains.find(item => item.id === chainId) || chains[0];
+  // const selectedChain = chains.find(item => item.id === chainId) || chains[0];
+  const selectedChain = chains[0];
 
 
   useEffect(() => {
@@ -104,7 +102,7 @@ const UserMenu = () => {
 
   useEffect(() => {
     if (isWrongNetwork) {
-      toastError('', <Text mt="2px" mr="0" mb="">You’re on the wrong network. Please connect to the Glitch network.</Text>)
+      toastError('', <Text mr="0" mb="">You’re on the wrong network. Please connect to the Glitch network.</Text>)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWrongNetwork]);
@@ -138,7 +136,6 @@ const UserMenu = () => {
   //   )
   // }
 
-  // console.log('@isWrongNetwork', isWrongNetwork);
 
   // if (isWrongNetwork) {
   //   return (
@@ -148,12 +145,10 @@ const UserMenu = () => {
   //   )
   // }
 
-  console.log('@account', account);
-
   return (
     <UserMenuWrapper>
       <GlitchBridge onClick={() => {
-        window.open('https://bridge.glitch.finance/');
+        window.open(process.env.NEXT_PUBLIC_GLITCH_BRIDGE_URL || 'https://bridge.glitch.finance/');
       }}>
         <Text mr="10px">Glitch Bridge</Text>
         <img className="open-link-svg" src="/images/open-link-icon.svg" alt={t('Glitch Bridge')} />
@@ -188,9 +183,9 @@ const UserMenu = () => {
           </ConnectWalletButton>
         )
       }
-      <ThemeSwitcher>
+      {/* <ThemeSwitcher>
         <Image src="/images/sun-icon.svg" height={16} width={16} />
-      </ThemeSwitcher>
+      </ThemeSwitcher> */}
     </UserMenuWrapper>
     // <ConnectMetaButton />
   )

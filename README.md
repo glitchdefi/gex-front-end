@@ -47,6 +47,8 @@ NEXT_PUBLIC_GLITCH_EXPLORER=https://testnet.snowtrace.io
 - Application domain
 ```
 NEXT_PUBLIC_GLITCH_DOMAIN_URL=https://gex-test.blockdevs.info
+NEXT_PUBLIC_MINIMUM_GLCH=0.1
+NEXT_PUBLIC_GLITCH_BRIDGE_URL=https://bridge.glitch.finance
 ```
 - Smart contracts
 ```
@@ -70,4 +72,22 @@ export enum GAS_PRICE {
 ```
 
 ### Tokens
-Change the default token list in file `/config/constant/tokenLists/glitch-default.tokenlist`.
+Change the suggested and default token list in the file `/config/constant/tokenLists/glitch-default.tokenlist`.
+
+
+Change feee
+packages/swap-sdk/src/constants.ts
+src/config/constants/exchange.ts
+src/config/constants/info.ts
+
+
+
+```
+panicked at 'the global thread pool has not been initialized.: threadpool builderror { kind: ioerror(error { kind: unsupported, message: "operation not supported on this platform" }) }
+```
+It seems like an issue with the swcMinify option in the nextConfig, try setting it to false.
+`next.config.js`
+```const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: false,
+};```

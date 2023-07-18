@@ -176,6 +176,7 @@ export function useDerivedMintInfo(
         return undefined
       }
     }
+
     return undefined
   }, [parsedAmounts, chainId, pair, totalSupply])
 

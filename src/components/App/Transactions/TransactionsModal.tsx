@@ -51,28 +51,24 @@ const TransactionsModal: React.FC<InjectedModalProps> = ({ onDismiss }) => {
 
   return (
     <Modal title={t('Transaction history')} headerBackground="gradients.cardHeader" onDismiss={onDismiss} bodyPadding="0px">
-      {account ? (
-        <ModalBody width="640px">
-          {!!pending.length || !!confirmed.length ? (
-            <>
-              {/* <AutoRow mb="1rem" style={{ justifyContent: 'space-between' }}>
-                <Text>{t('Recent Transactions')}</Text>
-                <Button variant="tertiary" scale="xs" onClick={clearAllTransactionsCallback}>
-                  {t('clear all')}
-                </Button>
-              </AutoRow> */}
-              {renderTransactions(pending)}
-              {renderTransactions(confirmed)}
-            </>
-          ) : (
-            <NotFound>
-              <Text>{t('No recent transactions')}</Text>
-            </NotFound>
-          )}
-        </ModalBody>
-      ) : (
-        <ConnectWalletButton />
-      )}
+      <ModalBody width="640px">
+        {account && (!!pending.length || !!confirmed.length) ? (
+          <>
+            {/* <AutoRow mb="1rem" style={{ justifyContent: 'space-between' }}>
+              <Text>{t('Recent Transactions')}</Text>
+              <Button variant="tertiary" scale="xs" onClick={clearAllTransactionsCallback}>
+                {t('clear all')}
+              </Button>
+            </AutoRow> */}
+            {renderTransactions(pending)}
+            {renderTransactions(confirmed)}
+          </>
+        ) : (
+          <NotFound>
+            <Text>{t('No recent transactions')}</Text>
+          </NotFound>
+        )}
+      </ModalBody>
     </Modal>
   )
 }

@@ -24,6 +24,7 @@ import { transactionErrorToUserReadableMessage } from 'utils/transactionErrorToU
 import { useLPApr } from 'state/swap/hooks'
 import { CAKE } from 'config/constants/tokens'
 import useToast from 'hooks/useToast'
+import isValidAmount from 'utils/isValidAmount'
 
 import { AutoColumn, ColumnCenter } from '../../components/Layout/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
@@ -39,7 +40,7 @@ import { Field, resetMintState } from '../../state/mint/actions'
 import { useDerivedMintInfo, useMintActionHandlers, useMintState, useZapIn } from '../../state/mint/hooks'
 
 import { useTransactionAdder } from '../../state/transactions/hooks'
-import { useGasPrice, useUserSlippageTolerance, useZapModeManager } from '../../state/user/hooks'
+import { useGasPrice, useUserSlippageTolerance, useZapModeManager, usePairAdder } from '../../state/user/hooks'
 import { calculateGasMargin } from '../../utils'
 import { getRouterContract, calculateSlippageAmount } from '../../utils/exchange'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
@@ -49,6 +50,8 @@ import Page from '../Page'
 import { formatAmount } from '../../utils/formatInfoNumbers'
 import { useCurrencySelectRoute } from './useCurrencySelectRoute'
 import { useAppDispatch } from '../../state'
+import { usePair } from '../../hooks/usePairs'
+
 
 const StyledRateSection = styled.div`
   display: flex;
@@ -107,6 +110,7 @@ export default function AddLiquidity() {
   const router = useRouter()
   const { account, chainId, library } = useActiveWeb3React()
   const gasPriceMeta = useGasPriceMeta();
+  const addPair = usePairAdder()
 
   const { toastError, toastSuccess } = useToast()
 
@@ -282,8 +286,12 @@ export default function AddLiquidity() {
     let method: (...args: any) => Promise<TransactionResponse>
     let args: Array<string | string[] | number>
     let value: BigNumber | null
+
+    parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)
+
     if (currencyA === ETHER || currencyB === ETHER) {
       const tokenBIsBNB = currencyB === ETHER
+
       estimate = routerContract.estimateGas.addLiquidityETH
       method = routerContract.addLiquidityETH
       args = [
@@ -294,6 +302,7 @@ export default function AddLiquidity() {
         account,
         deadline.toHexString(),
       ]
+
       value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
     } else {
       estimate = routerContract.estimateGas.addLiquidity
@@ -308,6 +317,7 @@ export default function AddLiquidity() {
         account,
         deadline.toHexString(),
       ]
+
       value = null
     }
 
@@ -327,6 +337,15 @@ export default function AddLiquidity() {
             } and ${parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)} ${currencies[Field.CURRENCY_B]?.symbol}`,
             type: 'add-liquidity',
           })
+
+          window?.localStorage?.setItem('g-pairs', JSON.stringify([
+            wrappedCurrency(currencyA, chainId)?.address,
+            wrappedCurrency(currencyB, chainId)?.address,
+          ]));
+
+          // if (pair) {
+          //   setTimeout(() => { addPair(pair) }, 3000)
+          // }
         }),
       )
       .catch((err) => {
@@ -374,7 +393,7 @@ export default function AddLiquidity() {
 
   const shouldShowApprovalGroup = (showFieldAApproval || showFieldBApproval) && isValid
 
-  const showAddLiquidity = true;
+  const showAddLiquidity = true
 
   if (isAdding) {
     return (
@@ -386,9 +405,15 @@ export default function AddLiquidity() {
         price={price}
         noLiquidity={noLiquidity}
         currencies={currencies}
-      />
+        tokenAmountA={parsedAmounts[Field.CURRENCY_A]}
+        tokenAmountB={parsedAmounts[Field.CURRENCY_B]}
+        shareOfPool={noLiquidity && price
+          ? '100'
+          : (poolTokenPercentage?.lessThan(ONE_BIPS) ? '<0.01' : poolTokenPercentage?.toFixed(2)) ?? '0'}
+        />
     )
   }
+
   return (
     <Page>
       <AppBody>
@@ -420,7 +445,7 @@ export default function AddLiquidity() {
                   )}
                   <CurrencyInputPanel
                     label="Input"
-                    onInputBlur={zapIn.onInputBlurOnce}
+                    // onInputBlur={zapIn.onInputBlurOnce}
                     disabled={canZap && !zapTokenCheckedA}
                     onCurrencySelect={handleCurrencyASelect}
                     // zapStyle={canZap ? 'zap' : 'noZap'}
@@ -436,12 +461,12 @@ export default function AddLiquidity() {
                   />
                   <StyledRateSection>
                     <AddIcon width="32px" />
-                    <span>{`Rate: 1 ${currencies[Field.CURRENCY_A]?.symbol} ~ ${price?.toSignificant(6) ?? '-'} ${currencies[Field.CURRENCY_B]?.symbol}`}</span>
+                    <span>{`Rate: 1 ${currencies[Field.CURRENCY_A]?.symbol} ~ ${price?.toSignificant(6) ?? '-'} ${currencies[Field.CURRENCY_B] ? currencies[Field.CURRENCY_B]?.symbol : ''}`}</span>
                     {/* <img src="images/refresh-icon.svg" alt="refresh icon" /> */}
                   </StyledRateSection>
                   <CurrencyInputPanel
                     label="Input"
-                    onInputBlur={zapIn.onInputBlurOnce}
+                    // onInputBlur={zapIn.onInputBlurOnce}
                     disabled={canZap && !zapTokenCheckedB}
                     onCurrencySelect={handleCurrencyBSelect}
                     value={formattedAmounts[Field.CURRENCY_B]}
@@ -482,12 +507,10 @@ export default function AddLiquidity() {
                     </RowBetween>
                   )}
 
-                  {addIsUnsupported || addIsWarning ? (
+                  {account && (addIsUnsupported || addIsWarning) ? (
                     <Button disabled mb="4px">
                       {t('Unsupported Asset')}
                     </Button>
-                  ) : !account ? (
-                    <ConnectWalletButton />
                   ) : (
                     <AutoColumn gap="md">
                       {shouldShowApprovalGroup && (
@@ -524,6 +547,15 @@ export default function AddLiquidity() {
                         isLoading={preferZapInstead && zapInEstimating}
                         variant={!isValid || zapIn.priceSeverity > 2 ? 'danger' : 'primary'}
                         onClick={() => {
+                          const inputAmount = parsedAmounts[Field.CURRENCY_A]?.toSignificant(3)
+                          const outputAmount = parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)
+
+                          if (!isValidAmount(currencyA, +inputAmount)
+                            || !isValidAmount(currencyB, +outputAmount)) {
+                            toastError('', `Minimum amount must be ${process.env.NEXT_PUBLIC_MINIMUM_GLCH} GLCH`)
+                            return;
+                          }
+
                           setLiquidityState({
                             attemptingTxn: false,
                             liquidityErrorMessage: undefined,

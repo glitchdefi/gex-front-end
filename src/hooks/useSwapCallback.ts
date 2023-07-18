@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
-import { SwapParameters, Trade } from '@pancakeswap/sdk'
+import { SwapParameters, Trade, ETHER } from '@pancakeswap/sdk'
 import { useTranslation } from 'contexts/Localization'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useMemo } from 'react'
@@ -76,10 +76,6 @@ export function useSwapCallback(
               contract,
             } = call
             const options = !value || isZero(value) ? {} : { value }
-
-            console.log('@contract', contract)
-            console.log('@methodName', methodName)
-
             return contract.estimateGas[methodName](...args, options)
               .then((gasEstimate) => {
                 return {
@@ -88,7 +84,6 @@ export function useSwapCallback(
                 }
               })
               .catch((gasError) => {
-                console.error('@gasError', gasError)
                 console.error('Gas estimate failed, trying eth_call to extract error', call)
 
                 return contract.callStatic[methodName](...args, options)

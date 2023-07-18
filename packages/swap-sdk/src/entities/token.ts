@@ -18,7 +18,7 @@ export class Token extends Currency {
     decimals: number,
     symbol?: string,
     name?: string,
-    projectLink?: string
+    projectLink?: string,
   ) {
     super(decimals, symbol, name)
     this.chainId = chainId
@@ -108,7 +108,7 @@ export const WBNB = {
 export const WGLCH = {
   [ChainId.GLITCH]: new Token(
     ChainId.GLITCH,
-    '0x17AD31C40fADE58ee8b5Ac404EeA4fE52d4B1d68',
+    process.env.NEXT_PUBLIC_GLITCH_NATIVE_TOKEN || '0x17AD31C40fADE58ee8b5Ac404EeA4fE52d4B1d68',
     18,
     'WGLCH',
     'Wrapped GLCH',

@@ -171,8 +171,6 @@ export function useSingleContractMultipleData(
   const { chainId } = useActiveWeb3React()
   const fragment = useMemo(() => contract?.interface?.getFunction(methodName), [contract, methodName])
 
-  console.log('@contract.address', contract.address)
-
   const calls = useMemo(
     () =>
       contract && fragment && callInputs && callInputs.length > 0
@@ -203,10 +201,6 @@ export function useMultipleContractSingleData(
   callInputs?: OptionalMethodInputs,
   options?: ListenerOptions,
 ): CallState[] {
-  console.log('@useMultipleContractSingleData');
-  console.log('@methodName', methodName);
-  console.log('@contractInterface', contractInterface);
-
   const fragment = useMemo(() => contractInterface.getFunction(methodName), [contractInterface, methodName])
   const callData: string | undefined = useMemo(
     () =>

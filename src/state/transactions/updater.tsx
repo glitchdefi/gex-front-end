@@ -41,8 +41,6 @@ export default function Updater(): null {
   const state = useSelector<AppState, AppState['transactions']>((s) => s.transactions)
 
   const transactions = useMemo(() => (chainId ? state[chainId] ?? {} : {}), [chainId, state])
-  console.log('@transactions', transactions);
-
   const { toastError, toastSuccess } = useToast()
 
   useEffect(() => {

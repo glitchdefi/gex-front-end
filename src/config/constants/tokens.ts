@@ -72,7 +72,6 @@ export const USDC = {
 export const CAKE = {
   [ChainId.BSC]: CAKE_MAINNET,
   [ChainId.BSC_TESTNET]: CAKE_TESTNET,
-  // [ChainId.GLITCH]: GUS_TESTNET,
   [ChainId.GLITCH]: USDT_TESTNET,
 }
 
@@ -80,12 +79,6 @@ export const BUSD: Record<ChainId, Token> = {
   [ChainId.BSC]: BUSD_MAINNET,
   [ChainId.BSC_TESTNET]: BUSD_TESTNET,
   [ChainId.GLITCH]: USDT_TESTNET,
-}
-// * FIXME:
-export const GUS: Record<ChainId, Token> = {
-  [ChainId.BSC]: BUSD_MAINNET,
-  [ChainId.BSC_TESTNET]: BUSD_TESTNET,
-  [ChainId.GLITCH]: BUSD_TESTNET,
 }
 
 export const bscTokens = {
@@ -2348,28 +2341,6 @@ export const bscTokens = {
     'PEEL',
     'Meta Apes Peel',
     'https://metaapesgame.com/',
-  ),
-}
-
-export const bscTestnetTokens = {
-  wbnb: WBNB[ChainId.BSC_TESTNET],
-  cake: CAKE_TESTNET,
-  busd: BUSD_TESTNET,
-  syrup: new Token(
-    ChainId.BSC_TESTNET,
-    '0xfE1e507CeB712BDe086f3579d2c03248b2dB77f9',
-    18,
-    'SYRUP',
-    'SyrupBar Token',
-    'https://pancakeswap.finance/',
-  ),
-  bake: new Token(
-    ChainId.BSC_TESTNET,
-    '0xE02dF9e3e622DeBdD69fb838bB799E3F168902c5',
-    18,
-    'BAKE',
-    'Bakeryswap Token',
-    'https://www.bakeryswap.org/',
   ),
 }
 
